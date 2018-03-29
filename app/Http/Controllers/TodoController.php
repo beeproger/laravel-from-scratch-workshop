@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Todo;
+use App\Models\Todo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TodoController extends Controller
 {
@@ -14,7 +15,9 @@ class TodoController extends Controller
      */
     public function index()
     {
-        //
+        $todos = Auth::user()->todos;
+
+        return view('todos.index', compact('todos'));
     }
 
     /**
@@ -24,7 +27,7 @@ class TodoController extends Controller
      */
     public function create()
     {
-        //
+        return view('todos.create');
     }
 
     /**
@@ -35,51 +38,77 @@ class TodoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+            'title' => 'required',
+        ]);
+
+        $todo = Auth::user()
+            ->todos()
+            ->create($request->only(['title']));
+
+        return redirect(route('todos.index'));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Todo  $todo
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Todo $todo)
-    {
-        //
-    }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Todo  $todo
-     * @return \Illuminate\Http\Response
+     * @param Todo $todo
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function edit(Todo $todo)
     {
-        //
+        return view('todos.edit', compact('todo'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Todo  $todo
+     * @param  \Illuminate\Http\Request $request
+     * @param Todo $todo
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Todo $todo)
     {
-        //
+        $this->validate($request, [
+            'title' => 'required',
+        ]);
+
+        if($todo->user_id == Auth()->user()->id) {
+            $todo->update($request->only(['title']));
+
+            return redirect(route('todos.index'));
+        }
+
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Update the specified resource in storage.
      *
-     * @param  \App\Todo  $todo
+     * @param  \Illuminate\Http\Request $request
+     * @param Todo $todo
      * @return \Illuminate\Http\Response
+     */
+    public function done(Request $request, Todo $todo)
+    {
+        if($todo->user_id == Auth()->user()->id) {
+
+            $todo->update(['done' => !$todo->done]);
+
+            return redirect(route('todos.index'));
+        }
+
+    }
+
+    /**
+     * @param Todo $todo
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Exception
      */
     public function destroy(Todo $todo)
     {
-        //
+        if($todo->user_id == Auth()->user()->id) {
+            $todo->delete();
+            return redirect(route('todos.index'));
+
+        }
     }
 }

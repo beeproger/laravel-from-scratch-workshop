@@ -27,4 +27,8 @@ Route::middleware('auth')->group(function() {
     Route::get('todo/{todo}', 'TodoController@edit')->name('todos.edit');
     Route::put('todo/{todo}', 'TodoController@update')->name('todos.update');
     Route::delete('todo/{todo}', 'TodoController@destroy')->name('todos.destroy');
+
+//     OR
+//    Route::resource('todo', 'TodoController');
+
 });

@@ -76,16 +76,7 @@
             <div class="col-5">
                 <h3>Toevoegen</h3>
                 <hr>
-                <form class="form" method="POST" action="{{ route('todos.store') }}">
-                    {{ csrf_field() }}
-
-                    <div class="form-group">
-                        <label>Titel</label>
-                        <input type="text" name="title" class="form-control" placeholder="Typ tekst">
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">Opslaan</button>
-                </form>
+                @include('todos.create')
             </div>
     </div>
 @endsection

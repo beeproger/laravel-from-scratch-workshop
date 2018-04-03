@@ -2,58 +2,90 @@
 
 @section('content')
     <div class="container">
-        <p class="row">
-            <a href="{{ route('todos.create') }}" class="btn btn-primary">Nieuwe todo</a>
-        </p>
 
         <div class="row justify-content-center">
 
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>titel</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($todos as $todo)
+            <div class="col-5">
+                <h3>Overzicht</h3>
+
+                <table class="table table-striped">
+                    <thead>
                         <tr>
-                            <td>{{ $todo->id }}</td>
-                            <td>{{ $todo->title }}</td>
-                            <td>
-                                <a href="{{ route('todos.edit', compact('todo')) }}" class="btn btn-dark">edit</a>
-                                @if($todo->done)
-
-                                    <a href="{{ route('todos.done', compact('todo')) }}" class="btn btn-primary"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('done-form').submit();">
-                                        klaar
-                                    </a>
-
-                                    <form id="done-form" action="{{ route('todos.done', compact('todo')) }}" method="POST" style="display: none;">
-                                        @csrf
-                                    </form>
-
-                                @else
-
-
-                                    <a href="{{ route('todos.done', compact('todo')) }}" class="btn btn-primary"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('done-form').submit();">
-                                        markeer klaar
-                                    </a>
-
-                                    <form id="done-form" action="{{ route('todos.done', compact('todo')) }}" method="POST" style="display: none;">
-                                        @csrf
-                                    </form>
-
-                                @endif
-                            </td>
+                            <th width="10px"></th>
+                            <th>Titel</th>
+                            <th class="text-right"></th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        @forelse($todos as $todo)
+                            <tr>
+                                <td>
+                                    @if($todo->done)
+
+                                        <a href="{{ route('todos.done', compact('todo')) }}" class="btn btn-lg btn-default"
+                                           onclick="event.preventDefault();
+                                                   document.getElementById('done-form{{ $todo->id }}').submit();">
+                                            <i class="icon ion-android-checkbox-outline"></i>
+                                        </a>
+
+                                        <form id="done-form{{ $todo->id }}" action="{{ route('todos.done', compact('todo')) }}" method="POST" style="display: none;">
+                                            @csrf
+                                        </form>
+
+                                    @else
+
+
+                                        <a href="{{ route('todos.done', compact('todo')) }}" class="btn btn-lg btn-default"
+                                           onclick="event.preventDefault();
+                                                   document.getElementById('done-form{{ $todo->id }}').submit();">
+                                            <i class="icon ion-android-checkbox-outline-blank"></i>
+                                        </a>
+
+                                        <form id="done-form{{ $todo->id }}" action="{{ route('todos.done', compact('todo')) }}" method="POST" style="display: none;">
+                                            @csrf
+                                        </form>
+
+                                    @endif
+                                </td>
+                                <td>{{ $todo->title }}</td>
+                                <td class="text-right">
+
+
+                                    <a href="{{ route('todos.destroy', compact('todo')) }}" class="btn btn-outline-danger"
+                                       onclick="event.preventDefault();
+                                               document.getElementById('delete-form{{ $todo->id }}').submit();">
+                                        <i class="icon ion-trash-a"></i>
+                                    </a>
+
+                                    <form id="delete-form{{ $todo->id }}" action="{{ route('todos.destroy', compact('todo')) }}" method="POST" style="display: none;">
+                                        @csrf
+                                        {{ method_field('DELETE') }}
+                                    </form>
+
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3">Geen todo's.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <div class="col"></div>
+            <div class="col-5">
+                <h3>Toevoegen</h3>
+                <hr>
+                <form class="form" method="POST" action="{{ route('todos.store') }}">
+                    {{ csrf_field() }}
+
+                    <div class="form-group">
+                        <label>Titel</label>
+                        <input type="text" name="title" class="form-control" placeholder="Typ tekst">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Opslaan</button>
+                </form>
+            </div>
     </div>
 @endsection
